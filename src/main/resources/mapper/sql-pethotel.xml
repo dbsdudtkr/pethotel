@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="pethotel.mapper.PetHotelMapper">
+	<!-- qna -->
+	<insert id = "insertconsulting" parameterType="pethotel.dto.ConsultingDto">
+	insert into consulting(consulting_title,contents)
+	values(#{consultingTitle},#{contents})
+	</insert>
+	<update id = "insertreply" parameterType="pethotel.dto.ConsultingDto" >
+	update  consulting
+	set reply = (#{reply})
+	where consulting_idx=#{consultingIdx}
+	</update>
+	<select id ="detail"  parameterType="int" resultType="pethotel.dto.ConsultingDto">
+	select consulting_idx,consulting_title,contents,reply
+	from consulting
+	where consulting_idx=#{consultingIdx}
+	</select>
+<select id ="selectConsultingList" parameterType="int" resultType = "pethotel.dto.ConsultingDto">
+		select 	consulting_idx, consulting_title
+		  from consulting
+
+		order by consulting_idx desc
+    		limit #{offset}, 10
+	</select>
+	<select id="selectConsultingListCount" resultType="int">
+		select count(*)
+		  from consulting
+		
+	</select> 
+	
+	<!-- 업체등록 -->
+	<insert id ="insertcompany" parameterType="pethotel.dto.CompanyDto" 
+	useGeneratedKeys="true" keyProperty="companyIdx">
+	insert into company(company_name,company_info,company_address,company_photo)
+	values(#{companyName},#{companyInfo},#{companyAddress},#{companyPhoto})
+	</insert>
+	<!-- 회사정보 뽑기 -->
+	<select id ="companylist" resultType = "pethotel.dto.CompanyDto">
+	select 	company_idx,company_name,company_photo,company_info,company_address
+	from company
+  limit #{offset}, 4
+	</select>
+	<!-- 회사 한개 뽑기 -->
+	<select id ="onecompany"  parameterType="int" resultType="pethotel.dto.CompanyDto">
+	select company_idx,company_name,company_photo,company_info,company_address
+	from company
+	where company_idx=#{companyIdx}
+	</select>
+	<!-- ㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴ -->
+	<!-- 업체 상세 -->
+    <select id="averageStar" resultType="pethotel.dto.ReviewDto">
+   	select round(avg(star_idx),1) as averageStar from review where company_idx=1;
+    </select> 
+    <select id="companydetail" resultType="pethotel.dto.CompanyDto">
+        select company_name, company_photo, company_info, company_address 
+        <!-- date_format(created_dt, '%Y-%m-%d %H:%i:%s') as created_dt -->
+        from company
+        <!-- where deleted_yn = 'N' -->
+        where company_idx = #{companyIdx}
+    </select>
+    <!-- 리뷰 리스트 -->
+    <select id="reviewlist1" parameterType="int"
+        resultType="pethotel.dto.CompanyDto">
+        select company_idx
+        from company 
+    <!-- from company, review  -->
+        where company_idx = #{companyIdx}
+    <!-- limit 5  되는건지 안되는건지 모름 안될경우 뺄 것 -->
+    <!-- 리뷰 입력 -->
+    </select>
+
+    <select id="reviewlist2" parameterType="int"
+    resultType="pethotel.dto.ReviewDto">
+        select review_contents, review_writer,star_idx
+        from review
+		 where company_idx = #{companyIdx}
+     </select>
+     <select id="star"   resultType="pethotel.dto.StarDto">
+     	select star_idx
+     	from star
+     </select>
+    <!-- limit 5  되는 안되는건지 모름 안될경우 뺄 것 -->
+    <!-- 리뷰 입력 -->
+ 
+
+<!--     <update id="insertreview"
+        parameterType="pethotel.dto.ReviewDto">
+        update review
+        set review = (#{review})
+        where company_idx = #{companyIdx}
+        where company_idx = #{reviewIdx}
+    </update> -->
+    <insert id ="insertreview" parameterType="pethotel.dto.ReviewDto" >
+    insert into review(review_writer, review_contents, company_idx,star_idx)
+    values(#{reviewWriter},#{reviewContents},#{companyIdx},#{starIdx})
+    </insert>
+<!--  useGeneratedKeys="true" keyProperty="companyIdx" -->
+ 	
+<!-- 예약등록 -->
+
+
+<insert id="insertapply" parameterType="pethotel.dto.ApplyDto" >
+insert into apply(apply_name, apply_period, phonenumber, contents, dog_name,company_idx)
+values (#{applyName}, #{applyPeriod}, #{phonenumber}, #{contents}, #{dogName},#{companyIdx})
+ </insert>
+
+<select id="displayinsert" parameterType="pethotel.dto.CompanyDto" resultType="pethotel.dto.CompanyDto">
+select company_name,company_idx
+from company
+where company_idx=#{companyIdx}
+</select>
+<!-- 예약목록 -->
+
+
+<select parameterType="int" id="reservation" resultType="pethotel.dto.ApplyDto">
+	select apply_idx, apply_name, apply_period, phonenumber, dog_name, contents
+	  from apply
+	where apply_idx=#{applyIdx} 
+</select>
+
+<!-- 예약확인 -->
+
+
+<select id="applylist" parameterType="map" resultType="pethotel.dto.ApplyDto">
+	select apply_idx, apply_name, contents,company_idx
+	  from apply 
+	where company_idx=#{companyIdx}
+	  order by apply_idx desc
+    	    limit #{offset}, 10
+</select>
+<select id="selectApplyListCount" resultType="int">
+	select count(*)
+	  from apply
+</select> 
+  	
+  <!--  페이징 -->
+  	
+  	<select id="selectBoardListCount" resultType="int">
+		select count(*)
+		  from company
+	</select> 
+		
+</mapper>
